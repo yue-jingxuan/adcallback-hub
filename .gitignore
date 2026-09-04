@@ -5,16 +5,49 @@
 *.ipr
 out/
 
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
 # Maven
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# 日志
+# Gradle
+.gradle/
+build/
+
+# 日志文件
 *.log
+logs/
 
-# 系统文件
+# 操作系统缓存文件
 .DS_Store
 Thumbs.db
 
-# 环境配置
-application-*.yml
-application-*.properties
+# 环境配置、本地配置文件（避免提交本地数据库、Redis密码）
+application-local.yml
+application-local.yaml
+application-dev.yml
+*.env
+
+# lombok生成缓存
+.apt_generated
+
+# dump文件
+*.hprof
+
+# 临时文件
+*.tmp
+*.bak
+*.swp
