@@ -1,0 +1,94 @@
+# ============================================================
+# 汇答投流回调网关（huida-callback-hub）基础配置
+# 敏感信息请通过环境变量或本地覆盖文件注入，切勿提交明文密码
+# ============================================================
+
+server:
+  # 服务监听端口
+  port: 8080
+
+spring:
+  application:
+    # 应用名称
+    name: huida-callback-hub
+
+  # -------------------- MySQL 数据源 --------------------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 数据库连接地址，库名默认为 callback_hub，可通过环境变量覆盖
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:huida_callback_hub}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    # 数据库账号（占位符，请替换为实际账号或通过环境变量 MYSQL_USERNAME 注入）
+    username: ${MYSQL_USERNAME:root}
+    # 数据库密码（占位符，请替换为实际密码或通过环境变量 MYSQL_PASSWORD 注入）
+    password: ${MYSQL_PASSWORD:root}
+    hikari:
+      # 连接池名称
+      pool-name: CallbackHubHikariCP
+      # 最小空闲连接数
+      minimum-idle: 5
+      # 最大连接数
+      maximum-pool-size: 20
+      # 空闲连接超时时间（毫秒）
+      idle-timeout: 30000
+      # 连接最大存活时间（毫秒）
+      max-lifetime: 1800000
+      # 获取连接超时时间（毫秒）
+      connection-timeout: 30000
+      # 连接探活 SQL
+      connection-test-query: SELECT 1
+
+  # -------------------- Redis 基础连接 --------------------
+  data:
+    redis:
+      # Redis 主机地址
+      host: ${REDIS_HOST:127.0.0.1}
+      # Redis 端口
+      port: ${REDIS_PORT:6379}
+      # Redis 库编号
+      database: ${REDIS_DATABASE:0}
+      # Redis 密码（占位符，无密码可置空；请通过环境变量 REDIS_PASSWORD 注入）
+      password: ${REDIS_PASSWORD:}
+      # 连接超时时间
+      timeout: 5000ms
+      lettuce:
+        pool:
+          # 连接池最大连接数（负数表示无限制）
+          max-active: 16
+          # 连接池最大空闲连接
+          max-idle: 8
+          # 连接池最小空闲连接
+          min-idle: 2
+          # 连接池最大阻塞等待时间（负数表示无限等待）
+          max-wait: 3000ms
+
+# -------------------- MyBatis-Plus --------------------
+mybatis-plus:
+  # Mapper XML 扫描路径
+  mapper-locations: classpath*:/mapper/**/*.xml
+  # 实体类包路径
+  type-aliases-package: com.huida.callbackhub.**.entity
+  configuration:
+    # 开启下划线转驼峰命名映射（user_id -> userId）
+    map-underscore-to-camel-case: true
+    # 通过 slf4j 打印 SQL，生产可将 logger 级别调到 INFO 以上关闭
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    # 缓存已关闭，避免回调场景下读到脏配置
+    cache-enabled: false
+  global-config:
+    banner: false
+    db-config:
+      # 主键策略：数据库自增
+      id-type: auto
+      # 逻辑删除字段值
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+huida:
+  callback:
+    cache:
+      # 单条id/platformCode缓存过期时长(秒)，30分钟
+      single-ttl: 1800
+      # 列表缓存过期时长(秒)，8分钟
+      list-ttl: 480
+      # 空值占位缓存过期时长(秒)，3分钟，防御缓存穿透
+      null-ttl: 180
