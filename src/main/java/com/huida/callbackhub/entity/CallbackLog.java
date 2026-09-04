@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 /**
  * 回调请求日志实体，对应表 {@code callback_log}。
  * <p>
- * 记录各广告平台回调的原始报文、转发状态与重试信息，便于排查与补偿。
+ * 同时覆盖 CAPI 出站上报（mode_type=1）与 Webhook 入站转发（mode_type=2）。
  * </p>
  */
 @Data
@@ -29,20 +29,29 @@ public class CallbackLog implements Serializable {
     /** 平台编码：douyin / kuaishou / chuanshanjia */
     private String platform;
 
+    /** 事件唯一 ID，用于幂等，对应 uk_event_id */
+    private String eventId;
+
+    /** 模式：1-CAPI 出站上报，2-Webhook 入站转发 */
+    private Integer modeType;
+
     /** 广告点击 ID */
     private String clickId;
 
-    /** 回调原始请求报文 */
+    /** 原始请求报文 */
     private String rawBody;
 
-    /** 状态：pending 待转发、success 成功、failed 失败 */
+    /** CAPI 上报请求报文（模式 1） */
+    private String capiRequest;
+
+    /** CAPI 上报响应报文（模式 1） */
+    private String capiResponse;
+
+    /** 状态：pending 待处理、success 成功、failed 失败、dead 死信 */
     private String status;
 
     /** 已重试次数 */
     private Integer retryCount;
-
-    /** 最大重试次数 */
-    private Integer maxRetry;
 
     /** 失败错误信息 */
     private String errorMsg;
@@ -50,7 +59,7 @@ public class CallbackLog implements Serializable {
     /** 链路追踪 ID */
     private String traceId;
 
-    /** 下游转发地址 */
+    /** 下游转发地址（模式 2） */
     private String targetUrl;
 
     /** 创建时间 */

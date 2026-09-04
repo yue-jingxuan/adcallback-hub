@@ -1,7 +1,6 @@
 package com.huida.callbackhub.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -13,7 +12,8 @@ import java.time.LocalDateTime;
 /**
  * 投流平台配置实体，对应表 {@code platform_config}。
  * <p>
- * 保存平台验签密钥、默认下游转发地址及启停状态，回调主链路会高频读取。
+ * 密钥、token、api_url、超时等放在 {@code config_json}；
+ * {@code webhook_enabled} 控制是否接收 Webhook，{@code enabled} 控制平台总开关。
  * </p>
  */
 @Data
@@ -33,15 +33,20 @@ public class PlatformConfig implements Serializable {
     /** 平台名称 */
     private String platformName;
 
-    /** 验签密钥 */
-    private String signSecret;
+    /**
+     * 平台配置 JSON：secret、token、api_url、超时等。
+     * 对应 MySQL json 列 {@code config_json}。
+     */
+    private String configJson;
 
-    /** 默认下游转发地址 */
+    /** 默认下游转发地址（模式 2 Webhook 转发） */
     private String targetUrl;
 
-    /** 是否启用：1 启用，0 关闭 */
-    @TableField("enable")
-    private Integer enable;
+    /** 是否开启 Webhook 接收：1 开启，0 关闭（默认） */
+    private Integer webhookEnabled;
+
+    /** 是否启用：1 启用，0 禁用 */
+    private Integer enabled;
 
     /** 备注 */
     private String remark;
